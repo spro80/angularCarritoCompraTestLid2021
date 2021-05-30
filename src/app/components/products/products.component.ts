@@ -16,19 +16,72 @@ export class ProductsComponent implements OnInit {
   discountsList = Array();
   discountsHash = Array();
 
-  
   ngOnInit(): void {
     this.callGetProducts();
     this.callGetDiscounts();
   }
 
-  cleanCart(){
-    localStorage.removeItem('infoCart');
-    console.log( JSON.parse(localStorage.getItem('infoCart') || '{}' ) );
+
+  callGetProducts(){
+    console.log('[callGetProducts] Init in method');  
+    let products = Array();
+    this.productsService.getProducts$( )
+      .subscribe( (data: any) => {
+        console.log(data);
+        this.productsList = data.products;
+        products = data.products;
+
+        let chunk_size = 3;
+        this.chunkArray = products.map(function(e, i) {
+          return i % chunk_size === 0 ? products.slice(i, i + chunk_size) : null;
+        })
+        .filter(function(e) {
+          return e;
+        });
+
+      });
   }
 
+
+  callGetDiscounts(){
+    console.log('[callGetDiscounts] Init in method');  
+    this.productsService.getDiscounts( )
+      .subscribe( (data: any) => {
+        console.log(data);
+        this.discountsList = data.discounts;
+        this.discountsHash = this.discountsToStructureHash( this.discountsList );
+      });
+  }
+
+
+  discountsToStructureHash( discountList: any ) {
+    console.log('[discountsToHash] Init in method');
+    let discountsHash = new Array();
+    let removeStringInBrand = 'Marca';
+    let brand = '';
+
+    for(let i=0; i<discountList.length; i++) {
+      brand = discountList[i].brand;
+      let numberInBrand = parseInt(brand.replace(removeStringInBrand, ''));
+      
+      if (discountsHash[numberInBrand] === undefined){
+        discountsHash[numberInBrand] = new Object();
+        discountsHash[numberInBrand].brand =  discountList[i].brand;
+        discountsHash[numberInBrand].threshold =  discountList[i].threshold;
+        discountsHash[numberInBrand].discount =  discountList[i].discount;
+        discountsHash[numberInBrand].totalByBrand = 0;
+      }
+    }
+    console.log('[discountsToHash] return: ');
+    console.log(discountsHash);
+    return discountsHash;
+  }
+
+
   addProduct(itemId:number, brand:String, price: Number, description: String){
-    if( this.cart[itemId] === undefined ){
+    console.log('[addProduct] Init in method');
+    
+    if( this.cart[itemId] === undefined ) {
       this.cart[itemId] = new Object();
       this.cart[itemId].quantity = 1;
       this.cart[itemId].price = price;
@@ -40,176 +93,125 @@ export class ProductsComponent implements OnInit {
 
     localStorage.setItem('infoCart', JSON.stringify(this.cart));
     console.log( JSON.parse(localStorage.getItem('infoCart') || '{}' ) );
+
+    let cartStorage = JSON.parse(localStorage.getItem('infoCart') || '{}' );
   
-    let total = this.totalCart( );
-    console.log( "total a pagar: " );
-    console.log( total );
-    this.discountsHash = this.discountsToHash();
-    console.log( this.discountsHash );
-    this.totalCartByBrand()
+    let total = this.totalCart( cartStorage );
+    this.calculateTotalPriceByBrand( cartStorage );
+    let totalDiscounts = this.calculateTotalDiscount( );
+    let totalFinal = this.calculateTotalWithDiscounts( total, totalDiscounts );
   }
 
+
+  totalCart( cartStorage: any ): number {
+    console.log('[totalCart] Init in method');
+    let totalCart = 0;
+    for (var [key, value] of Object.entries( cartStorage )) {
+      console.log(key);
+      console.log(value);
+
+      if( value !== null ){
+        console.log( cartStorage[key].quantity );
+        console.log( cartStorage[key].price );
+        totalCart += (cartStorage[key].quantity * cartStorage[key].price);
+      }
+    }
+    console.log('[totalCart] return');
+    console.log(totalCart);
+    return totalCart;
+  }
+
+  calculateTotalPriceByBrand( cartStorage: any ) {
+    console.log('[calculateTotalPriceByBrand] Init in method');
+
+    let quantity;
+    let price;
+    let brand;
+    let brandNumber;
+    let threshold;
+    let discount;
+    let totalByProduct;
+    for (var [key, value] of Object.entries( cartStorage )) {
+
+      if( value !== null ){
+        quantity = cartStorage[key].quantity;
+        price = cartStorage[key].price;
+        totalByProduct = quantity * price; 
+        brand = cartStorage[key].brand;
+        brandNumber = parseInt(this.removeMarcaInBrand( brand ));
+        threshold = this.discountsHash[brandNumber].threshold;
+        discount = this.discountsHash[brandNumber].discount;
+
+        console.log(key, value, quantity, price, brand, brandNumber);
+        console.log( 'threshold, discount: '+threshold, discount);
+
+        this.discountsHash[brandNumber].totalByBrand += totalByProduct;
+      }
+    }
+    console.log('[calculateTotalPriceByBrand] this.discountsHash:');
+    console.log(this.discountsHash);
+  }
+
+
+  calculateTotalDiscount( ) {
+    console.log('[calculateTotalDiscount] Init in method');
+
+    let totalByBrand;
+    let threshold;
+    let discount;
+    let brandNumber;
+    let totalDiscounts = 0;
+    for (var [key, value] of Object.entries( this.discountsHash )) {
+      console.log(key, value, value.totalByBrand, value.threshold, value.discount);
+      totalByBrand = value.totalByBrand;
+      threshold = value.threshold;
+      discount = value.discount;
+      brandNumber = key;
+        
+      if( totalByBrand > 0) {
+        if( totalByBrand < threshold ){
+          let difference = threshold - totalByBrand;
+          let message = `Agrega ${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de ${discount} en tu compra!`;
+          console.log(message);
+          console.log(difference);
+        } else {
+          let message2 = `Se aplicó un descuento de ${discount} por haber comprado ${threshold} de productos Marca${brandNumber}!`;
+          console.log(message2);
+          totalDiscounts += discount;
+        }
+      }
+    }
+
+    console.log('[calculateTotalDiscount] return totalDiscounts');
+    console.log(totalDiscounts);
+    return totalDiscounts;
+  }
+
+
+  calculateTotalWithDiscounts( totalCart: number, totalDiscounts: number ) {
+
+    console.log('[calculateTotalWithDiscounts] Init in method');
+    let totalFinal: number = 0;
+    totalFinal = totalCart - totalDiscounts;
+    console.log('[calculateTotalWithDiscounts] return totalFinal:');
+    console.log(totalFinal);
+    return totalFinal;
+
+  }
+
+
+
+  cleanCart(){
+    localStorage.removeItem('infoCart');
+    console.log( JSON.parse(localStorage.getItem('infoCart') || '{}' ) );
+  }
 
   getInfoDiscounts() {
     console.log(this.discountsList);
   }
 
-
-  totalCart(): Number {
-    console.log("\n\n\nCALCULANDO TOTAL:");
-
-    let cart = JSON.parse(localStorage.getItem('infoCart') || '{}');
-    console.log("\n\n\nCALCULANDO TOTAL mostrar object hash:");
-    
-    let totalCart = 0;
-    for (var [key, value] of Object.entries( cart )) {
-      console.log(key);
-      console.log(value);
-
-      if( value === null ){
-        console.log( "el value es null para el id de cart" );
-      } else {
-        console.log( cart[key].quantity );
-        console.log( cart[key].price );
-        totalCart += (cart[key].quantity * cart[key].price);
-      }
-    }
-    console.log("\n\n\nCALCULANDO TOTAL mostrar object hash:");
-    return totalCart;
-  }
-
   removeMarcaInBrand( brand: String ){
     return brand.replace('Marca', '');
-  }
-
-  discountsToHash() {
-    let discountsHash = new Array();
-    let removeStringInBrand = 'Marca';
-    let brand = '';
-
-    for(let i=0; i<this.discountsList.length; i++) {
-      brand = this.discountsList[i].brand;
-      let numberInBrand = parseInt(brand.replace(removeStringInBrand, ''));
-     
-      if (discountsHash[numberInBrand] === undefined){
-        discountsHash[numberInBrand] = new Object();
-        discountsHash[numberInBrand].brand =  this.discountsList[i].brand;
-        discountsHash[numberInBrand].threshold =  this.discountsList[i].threshold;
-        discountsHash[numberInBrand].discount =  this.discountsList[i].discount;
-      }
-    }
-    return discountsHash;
-  }
-
-
-
-  totalCartByBrand() {
-
-    console.log("*******************TOTAL CART BY BRAND INIT*******************------------------");
-    let cart = JSON.parse(localStorage.getItem('infoCart') || '{}');
-    console.log("\n\n\nCALCULANDO TOTAL mostrar object hash:");
-    let cartByBrand = Array();
-    let totalCart = 0;
-    
-    for (var [key, value] of Object.entries( cart )) {
-      console.log("*****************************************************");
-      console.log(key);
-      console.log(value);
-
-      if( value === null ){
-        console.log( "el value es null para el id recorrido" );
-      } else {
-        console.log( "el value no es null para el id recorrido" );
-        console.log( cart[key].quantity );
-        console.log( cart[key].price );
-        console.log( cart[key].brand );
-        let brand = cart[key].brand;
-        console.log( brand );
-        let brandNumber = parseInt(this.removeMarcaInBrand( brand ));
-        console.log( brandNumber );
-
-        if( this.discountsHash[brandNumber].totalAcumulative === undefined ){
-          console.log("ENTRO EN EL IFFF de undefined");
-          this.discountsHash[brandNumber].totalAcumulative = (cart[key].quantity * cart[key].price);
-          console.log( this.discountsHash[brandNumber].totalAcumulative );
-          console.log( 'threshold::: '+this.discountsHash[brandNumber].threshold );
-          console.log( 'discount::: '+this.discountsHash[brandNumber].discount );
-          let threshold = this.discountsHash[brandNumber].threshold;
-          let discount = this.discountsHash[brandNumber].discount;
-          let acumulative = this.discountsHash[brandNumber].totalAcumulative;
-          
-          if( this.discountsHash[brandNumber].totalAcumulative < threshold ){
-            let difference = threshold - acumulative;
-            let message = `Agrega ${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de ${this.discountsHash[brandNumber].discount} en tu compra!`;
-            console.log(message);
-            console.log(difference);
-          } else {
-            let message2 = `Se aplicó un descuento de ${discount} por haber comprado ${threshold} de productos Marca${brandNumber}!`;
-            console.log(message2);
-          }
-        }else {
-          console.log("ENTRO EN ELSE de undefined");
-          this.discountsHash[brandNumber].totalAcumulative += (cart[key].quantity * cart[key].price);
-          console.log( this.discountsHash[brandNumber].totalAcumulative );
-          console.log( 'threshold::: '+this.discountsHash[brandNumber].threshold );
-          console.log( 'discount::: '+this.discountsHash[brandNumber].discount );
-
-          let threshold = this.discountsHash[brandNumber].threshold;
-          let acumulative = this.discountsHash[brandNumber].totalAcumulative;
-          let discount = this.discountsHash[brandNumber].discount;
-
-          if( this.discountsHash[brandNumber].totalAcumulative < threshold ){
-            let difference = threshold - acumulative;
-            let message = `Agrega ${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de ${this.discountsHash[brandNumber].discount} en tu compra!`;
-            console.log(message);
-            console.log(difference);
-          } else {
-            let message2 = `Se aplicó un descuento de ${discount} por haber comprado ${threshold} de productos Marca${brandNumber}!`;
-            console.log(message2);
-          }          
-        }
-
-        //this.discountsHash[brandNumber].totalAcumulative += (cart[key].quantity * cart[key].price);
-        //console.log( this.discountsHash[brandNumber].totalAcumulative );
-        //totalCart += (cart[key].quantity * cart[key].price);
-      }
-    }
-    console.log("*******************TOTAL CART BY BRAND END*******************------------------");
-  }
-
-
-  callGetProducts(){
-    console.log('Call to Get Products');
-    //this.productsService.createBodyProducts
-    
-    let products = Array();
-    this.productsService.getProducts$( )
-      .subscribe( (data: any) => {
-        //console.log(data);
-        //console.log(data.products);
-        this.productsList = data.products;
-        products = data.products;
-        console.log(products);
-
-        //let arr = [1,2,3,4,5,6,7,8];
-        let chunk_size = 3; //no. of elements you want to print in single row
-        this.chunkArray = products.map(function(e, i) {
-          return i % chunk_size === 0 ? products.slice(i, i + chunk_size) : null;
-        })
-        .filter(function(e) {
-          return e;
-        });
-
-      });
-    }
-
-  callGetDiscounts(){
-    console.log('Call to Get Discounts');
-    this.productsService.getDiscounts( )
-      .subscribe( (data: any) => {
-        console.log(data);
-        this.discountsList = data.discounts;
-      });
   }
 
 }
