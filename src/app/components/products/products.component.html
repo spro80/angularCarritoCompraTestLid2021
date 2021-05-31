@@ -3,7 +3,7 @@
 
       <!--<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" *ngFor="let product of productsList; let i = index">-->
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" *ngFor="let data of chunkArray ">
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cleanCart()">Add</button>          
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cleanCart()">Add</button>
           <div class="col" *ngFor="let item of data">
             <div class="card shadow-sm">
               <svg width="100%" height="225" src="www.lider.cl/catalogo/images/catalogo_no_photo.jpg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
@@ -11,16 +11,16 @@
                 <p class="card-text"> {{ item.id }} {{ item.brand }} {{ item.description }} {{ item.image }}  </p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addProduct(item.id, item.brand, item.price, item.description)">Add</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)='viewProduct()'>View</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)='removeProduct()'>-</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addProduct(item.id, item.brand, item.price, item.description)">+</button>
                   </div>
                   <small class="text-muted">${{ item.price }}</small>
                 </div>
               </div>
             </div>
         </div>
-        
+
       </div>
 
     </div>
