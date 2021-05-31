@@ -27,7 +27,7 @@ export class HeaderComponent implements OnInit {
 
   public openModal(modalId: string) {
 
-    if( this.validateShoppinCart() ) {
+    if( this.validateShoppingCart() ) {
       this.modalOpen = true;
       this.modalInformativeOpen = true;
       const title = '';
@@ -38,16 +38,16 @@ export class HeaderComponent implements OnInit {
 
   }
 
-  validateShoppinCart() {
-    let a = JSON.parse(sessionStorage.getItem('infoCart') || '{}' );
+  validateShoppingCart() {
+    let getInfoCart = JSON.parse(sessionStorage.getItem('infoCart') || '{}' );
     let validate = false;
-    if( a.length === undefined ) {
-      alert("todo: PENDING CREATE OTHER MODAL WITH MESSAGE.  There is not elements in the shopping cart. ");
+
+    if( getInfoCart.length === undefined || getInfoCart === {} ) {
+      alert("TODO: PENDING CREATE OTHER MODAL WITH MESSAGE.  There is not elements in the shopping cart. ");
       validate = false;
     }else {
       validate = true;
     }
-
     return validate;
   }
 
@@ -68,6 +68,12 @@ export class HeaderComponent implements OnInit {
     sessionStorage.removeItem('totalDiscountCartModal');
 
     sessionStorage.removeItem('totalWithDiscountCartModal');
+
+    sessionStorage.removeItem('');
+
+    sessionStorage.removeItem('');
+
+
   }
 
 }
