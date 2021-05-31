@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnInit } from '@angular/core';
 import { ProductsService } from './../../../app/modules/product/services/products.service'
 
 @Component({
@@ -53,7 +53,6 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  
 
   discountsToStructureHash( discountList: any ) {
     console.log('[discountsToHash] Init in method');
@@ -93,9 +92,68 @@ export class ProductsComponent implements OnInit {
     }
   }*/
 
+  discountsResetMessageDiscount( ) {
+    console.log('[discountsResetMessageDiscount] Init in method');
+
+    this.discountsHash = this.discountsHash.map( (elem, key) => {
+      if ( elem.message !== '') {
+        elem.message = '';
+      }else {
+        console.log('NOOOO se debe vaciar la estructura del elemento....');
+      }
+      if( elem.typeMessage !== 0) {
+        elem.typeMessage = 0;
+      }
+      if( elem.totalByBrand !== 0) {
+        elem.totalByBrand = 0;
+      }
+      return elem;
+    });
+  }
+
 
   subtractProduct( itemId:number ){
-    console.log('Call remove element');
+    console.log('subtractProduct: '+ itemId);
+
+    let cartStorage = JSON.parse(sessionStorage.getItem('infoCart') || '{}' );    
+    
+    let totalCart = 0;
+    let flagUpdateTotal = false;
+    let existProductInCart = false;
+    for (var [key, value] of Object.entries( cartStorage )) {
+      if( value !== null ){
+        totalCart += (cartStorage[key].quantity * cartStorage[key].price);
+
+        if( String(itemId) === key ) {
+          existProductInCart = true;
+          if( cartStorage[key].quantity > 0){
+            cartStorage[key].quantity -= 1; 
+            flagUpdateTotal = true;
+          }else {
+            existProductInCart = false;
+            flagUpdateTotal = false;
+          }
+
+        }
+      }
+    }
+
+    if( flagUpdateTotal ){
+      this.discountsResetMessageDiscount( );
+      
+      sessionStorage.setItem('infoCart', ''+JSON.stringify(cartStorage));
+
+      let cartStorageUpdated = JSON.parse(sessionStorage.getItem('infoCart') || '{}' );
+    
+      let total = this.totalCart( cartStorageUpdated );
+
+      this.calculateTotalPriceByBrand( cartStorageUpdated );
+
+      let totalDiscounts = this.calculateTotalDiscount( );
+
+      this.calculateTotalWithDiscounts( total, totalDiscounts );
+    }
+
   }
 
   addProduct(itemId:number, brand:String, price: Number, description: String){
@@ -125,7 +183,7 @@ export class ProductsComponent implements OnInit {
 
     let totalDiscounts = this.calculateTotalDiscount( );
 
-    /*let totalFinal = */this.calculateTotalWithDiscounts( total, totalDiscounts );
+    this.calculateTotalWithDiscounts( total, totalDiscounts );
   }
 
 
@@ -143,8 +201,6 @@ export class ProductsComponent implements OnInit {
         totalCart += (cartStorage[key].quantity * cartStorage[key].price);
       }
     }
-    console.log('[totalCart] return');
-    console.log(totalCart);
     
     sessionStorage.setItem('totalCartModal', ''+totalCart);
     return totalCart;
@@ -172,9 +228,6 @@ export class ProductsComponent implements OnInit {
         discount = this.discountsHash[brandNumber].discount;
 
         this.discountsHash[brandNumber].totalByBrand += totalByProduct;
-        // console.log(key, value, quantity, price, brand, brandNumber);
-        // console.log( 'threshold, discount, quantity, price totalByProduct: '+threshold, discount, quantity, price, totalByProduct);
-        // console.log( 'brand, totalByProduct: '+brandNumber,this.discountsHash[brandNumber].totalByBrand);
       }
     }
 
@@ -203,15 +256,12 @@ export class ProductsComponent implements OnInit {
       if( totalByBrand > 0) {
         if( totalByBrand < threshold ){
           let difference = threshold - totalByBrand;
-          let messageAddMoreProduct = `Agrega $${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de $${discount} en tu compra!`;
-          // console.log(message);
-          // console.log(difference);
+          messageAddMoreProduct = `Agrega $${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de $${discount} en tu compra!`;
           this.discountsHash[parseInt(brandNumber)].message = messageAddMoreProduct;
           this.discountsHash[parseInt(brandNumber)].typeMessage = 1;
 
         } else {
           messageDiscountsByBrand = `* Se aplicó un descuento de $${discount} por haber comprado $${threshold} de productos Marca${brandNumber}!`;
-          // console.log(message2);
           totalDiscounts += discount;
           this.discountsHash[parseInt(brandNumber)].message = messageDiscountsByBrand;
           this.discountsHash[parseInt(brandNumber)].typeMessage = 2;
@@ -221,16 +271,8 @@ export class ProductsComponent implements OnInit {
     sessionStorage.setItem('totalDiscountCartModal', ''+totalDiscounts);
 
     sessionStorage.setItem('discountsHash', ''+JSON.stringify(this.discountsHash));
-    console.log( JSON.parse(sessionStorage.getItem('discountsHash') || '{}' ) );
-
-
-    console.log('[calculateTotalDiscount] return totalDiscounts');
-    console.log(totalDiscounts);
 
     console.log(this.discountsHash);
-    
-
-
     return totalDiscounts;
   }
 
@@ -251,7 +293,7 @@ export class ProductsComponent implements OnInit {
 
 
   cleanCart() {
-    //localStorage.removeItem('infoCart');
+
     sessionStorage.removeItem('infoCart');
     console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
 
@@ -260,11 +302,9 @@ export class ProductsComponent implements OnInit {
     sessionStorage.removeItem('totalDiscountCartModal');
 
     sessionStorage.removeItem('totalWithDiscountCartModal');
-  }
 
-  /*getInfoDiscounts() {
-    console.log(this.discountsList);
-  }*/
+    sessionStorage.removeItem('discountsHash');
+  }
 
   removeMarcaInBrand( brand: String ){
     return brand.replace('Marca', '');
