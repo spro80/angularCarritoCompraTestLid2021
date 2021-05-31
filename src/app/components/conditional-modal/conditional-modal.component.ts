@@ -17,10 +17,18 @@ export class ConditionalModalComponent implements OnInit {
   productsList = Array();
   productsListClean = Array();
 
+  discountsHash = Array();
+  discountsHashClean = Array();
+  messageAddProducts = Array();
+  messageApplyDiscounts = Array();
+
   totalCartStorage : String = '';
   totalDiscountStorage : String = '';
   totalDiscountCartStorage : String = '';
   totalWithDiscountCartStorage : String = '';
+
+  existDiscount: Boolean = false;
+
   constructor() {
   }
 
@@ -31,12 +39,32 @@ export class ConditionalModalComponent implements OnInit {
     this.totalCartStorage = JSON.stringify(sessionStorage.getItem('totalCartModal'));
 
     this.totalDiscountCartStorage = JSON.stringify(sessionStorage.getItem('totalDiscountCartModal'));
+    if( this.totalDiscountCartStorage === "0"){
+      this.existDiscount = false;
+    }else{
+      this.existDiscount = true;
+    }
 
     this.totalWithDiscountCartStorage = JSON.stringify(sessionStorage.getItem('totalWithDiscountCartModal'));
+ 
 
     this.productsListClean = this.productsList.filter( elem => {
       return elem !== null
     });
+
+    this.discountsHash = JSON.parse(sessionStorage.getItem('discountsHash') || '{}' );
+    this.discountsHashClean = this.discountsHash.filter( (elem) => {
+      return elem!== null && elem.message !== ''
+    });
+
+    this.messageAddProducts = this.discountsHashClean.filter( (elem) => {
+      return elem.typeMessage === 1;
+    });
+
+    this.messageApplyDiscounts = this.discountsHashClean.filter( (elem) => {
+      return elem.typeMessage === 2;
+    });
+
 
   }
 
