@@ -53,6 +53,7 @@ export class ProductsComponent implements OnInit {
       });
   }
 
+  
 
   discountsToStructureHash( discountList: any ) {
     console.log('[discountsToHash] Init in method');
@@ -77,6 +78,19 @@ export class ProductsComponent implements OnInit {
     return discountsHash;
   }
 
+  /*
+  discountsResetTotalByBrand( ) {
+    console.log('[discountsToHash] Init in method');
+    let removeStringInBrand = 'Marca';
+    let brand = '';
+
+    for(let i=0; i<this.discountsHash.length; i++) {
+      brand = this.discountsHash[i].brand;
+      let numberInBrand = parseInt(brand.replace(removeStringInBrand, ''));
+      this.discountsHash[numberInBrand].totalByBrand = 0;
+    }
+  }*/
+
 
   addProduct(itemId:number, brand:String, price: Number, description: String){
     console.log('[addProduct] Init in method');
@@ -91,20 +105,27 @@ export class ProductsComponent implements OnInit {
       this.cart[itemId].quantity += 1;
     }
 
-    localStorage.setItem('infoCart', JSON.stringify(this.cart));
-    console.log( JSON.parse(localStorage.getItem('infoCart') || '{}' ) );
+    sessionStorage.setItem('infoCart', ''+JSON.stringify(this.cart));
+    console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
 
-    let cartStorage = JSON.parse(localStorage.getItem('infoCart') || '{}' );
+
+    this.discountsHash = this.discountsToStructureHash( this.discountsList );
+
+    let cartStorage = JSON.parse(sessionStorage.getItem('infoCart') || '{}' );
   
     let total = this.totalCart( cartStorage );
+
     this.calculateTotalPriceByBrand( cartStorage );
+
     let totalDiscounts = this.calculateTotalDiscount( );
-    let totalFinal = this.calculateTotalWithDiscounts( total, totalDiscounts );
+
+    /*let totalFinal = */this.calculateTotalWithDiscounts( total, totalDiscounts );
   }
 
 
   totalCart( cartStorage: any ): number {
     console.log('[totalCart] Init in method');
+
     let totalCart = 0;
     for (var [key, value] of Object.entries( cartStorage )) {
       console.log(key);
@@ -118,6 +139,8 @@ export class ProductsComponent implements OnInit {
     }
     console.log('[totalCart] return');
     console.log(totalCart);
+    
+    sessionStorage.setItem('totalCartModal', ''+totalCart);
     return totalCart;
   }
 
@@ -142,14 +165,13 @@ export class ProductsComponent implements OnInit {
         threshold = this.discountsHash[brandNumber].threshold;
         discount = this.discountsHash[brandNumber].discount;
 
-        console.log(key, value, quantity, price, brand, brandNumber);
-        console.log( 'threshold, discount: '+threshold, discount);
-
         this.discountsHash[brandNumber].totalByBrand += totalByProduct;
+        // console.log(key, value, quantity, price, brand, brandNumber);
+        // console.log( 'threshold, discount, quantity, price totalByProduct: '+threshold, discount, quantity, price, totalByProduct);
+        // console.log( 'brand, totalByProduct: '+brandNumber,this.discountsHash[brandNumber].totalByBrand);
       }
     }
-    console.log('[calculateTotalPriceByBrand] this.discountsHash:');
-    console.log(this.discountsHash);
+
   }
 
 
@@ -160,13 +182,14 @@ export class ProductsComponent implements OnInit {
     let threshold;
     let discount;
     let brandNumber;
-    let totalDiscounts = 0;
+    let totalDiscounts : number = 0;
     for (var [key, value] of Object.entries( this.discountsHash )) {
       console.log(key, value, value.totalByBrand, value.threshold, value.discount);
       totalByBrand = value.totalByBrand;
       threshold = value.threshold;
       discount = value.discount;
       brandNumber = key;
+      console.log("key, value, totalByBrand, threshold, discount", key, value, totalByBrand, threshold, discount );
         
       if( totalByBrand > 0) {
         if( totalByBrand < threshold ){
@@ -181,6 +204,7 @@ export class ProductsComponent implements OnInit {
         }
       }
     }
+    sessionStorage.setItem('totalDiscountCartModal', ''+totalDiscounts);
 
     console.log('[calculateTotalDiscount] return totalDiscounts');
     console.log(totalDiscounts);
@@ -193,22 +217,31 @@ export class ProductsComponent implements OnInit {
     console.log('[calculateTotalWithDiscounts] Init in method');
     let totalFinal: number = 0;
     totalFinal = totalCart - totalDiscounts;
+
+    sessionStorage.setItem('totalWithDiscountCartModal', ''+totalFinal);
+
     console.log('[calculateTotalWithDiscounts] return totalFinal:');
     console.log(totalFinal);
     return totalFinal;
-
   }
 
 
 
   cleanCart(){
-    localStorage.removeItem('infoCart');
-    console.log( JSON.parse(localStorage.getItem('infoCart') || '{}' ) );
+    //localStorage.removeItem('infoCart');
+    sessionStorage.removeItem('infoCart');
+    console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
+
+    sessionStorage.removeItem('totalCartModal');
+
+    sessionStorage.removeItem('totalDiscountCartModal');
+
+    sessionStorage.removeItem('totalWithDiscountCartModal');
   }
 
-  getInfoDiscounts() {
+  /*getInfoDiscounts() {
     console.log(this.discountsList);
-  }
+  }*/
 
   removeMarcaInBrand( brand: String ){
     return brand.replace('Marca', '');
