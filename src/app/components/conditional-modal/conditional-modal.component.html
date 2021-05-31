@@ -37,7 +37,7 @@
         </tr>
       </tbody>
     </table>
-    
+
     <div class="modal-add-more-products h6" *ngFor="let item of messageAddProducts ">
       <p> <span >{{item.message}} </span> </p>
     </div>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="modal-add-more-products" *ngIf="existDiscount">
-      <h5>Descuentos por marca: <span class="price text-success">${{totalDiscountCartStorage}}</span></h5>
+      <h5>Descuentos por marca: <span class="price text-success">$ {{totalDiscountCartStorage}}</span></h5>
     </div>
 
     <div class="modal-discounts" *ngFor="let item of messageApplyDiscounts ">

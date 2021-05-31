@@ -39,9 +39,12 @@ export class ConditionalModalComponent implements OnInit {
     this.totalCartStorage = JSON.stringify(sessionStorage.getItem('totalCartModal'));
 
     this.totalDiscountCartStorage = JSON.stringify(sessionStorage.getItem('totalDiscountCartModal'));
-    if( this.totalDiscountCartStorage === "0"){
+
+    if( this.totalDiscountCartStorage === "0" ){
+      console.log("entro en false");
       this.existDiscount = false;
     }else{
+      console.log("entro en true");
       this.existDiscount = true;
     }
 
