@@ -94,6 +94,10 @@ export class ProductsComponent implements OnInit {
   }*/
 
 
+  subtractProduct( itemId:number ){
+    console.log('Call remove element');
+  }
+
   addProduct(itemId:number, brand:String, price: Number, description: String){
     console.log('[addProduct] Init in method');
     
@@ -256,8 +260,6 @@ export class ProductsComponent implements OnInit {
     sessionStorage.removeItem('totalDiscountCartModal');
 
     sessionStorage.removeItem('totalWithDiscountCartModal');
-    
-
   }
 
   /*getInfoDiscounts() {

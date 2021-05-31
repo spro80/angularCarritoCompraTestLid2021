@@ -12,7 +12,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="btn-group">
                     <button type="button" class="btn btn-sm btn-outline-secondary" (click)='viewProduct()'>View</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)='removeProduct()'>-</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)='subtractProduct(item.id)'>-</button>
                     <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addProduct(item.id, item.brand, item.price, item.description)">+</button>
                   </div>
                   <small class="text-muted">${{ item.price }}</small>
