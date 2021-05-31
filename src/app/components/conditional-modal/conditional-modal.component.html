@@ -25,10 +25,10 @@
           </td>
           <td>{{item.description}}</td>
           <td>{{item.brand}}</td>
-          <td>{{item.price}}</td>
+          <td>${{item.price}}</td>
           <td>{{item.quantity}}</td>
           <!--<td class="qty"><input type="text" class="form-control" id="input1" value="2"></td>-->
-          <td>{{item.quantity * item.price}}</td>
+          <td>${{item.quantity * item.price}}</td>
           <td>
             <a href="#" (click)="removeItemInCart()" class="btn btn-danger btn-sm">
               <i class="fa fa-times"></i>
@@ -36,13 +36,22 @@
           </td>
         </tr>
       </tbody>
-    </table> 
-    <div class="d-flex ">
+    </table>
+    <div class="modal-add-more-products h6" *ngFor="let item of messageAddProducts ">
+      <p> <span >{{item.message}} </span> </p>
+    </div>
+
+    <div class="d-flex">
       <h5>SubTotal: <span class="price text-success">$ {{totalCartStorage}} </span></h5>
     </div>
-    <div class="d-flex">
+    <div class="modal-add-more-products" *ngIf="existDiscount">
       <h5>Descuentos por marca: <span class="price text-success">${{totalDiscountCartStorage}}</span></h5>
     </div>
+
+    <div class="modal-discounts" *ngFor="let item of messageApplyDiscounts ">
+      <p><span> {{item.message}} </span></p>
+    </div>
+
     <div class="d-flex">
       <h5>Total a pagar: <span class="price text-success">$ {{totalWithDiscountCartStorage}}</span></h5>
     </div>
