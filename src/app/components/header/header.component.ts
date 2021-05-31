@@ -35,9 +35,7 @@ export class HeaderComponent implements OnInit {
   }
 
   action(action: 'pos' | 'neg') {
-    if (action === 'pos'){
-      console.log('presiono ok');
-    } else if (action === 'neg') {
+    if (action === 'neg') {
       this.modalOpen = false;
     }
   }
