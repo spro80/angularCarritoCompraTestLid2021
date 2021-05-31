@@ -31,6 +31,8 @@ export class ConditionalModalComponent implements OnInit {
 
   existDiscount: Boolean = false;
 
+  showBodyShoppingCart : Boolean = false;
+
   constructor() {
   }
 
@@ -58,7 +60,7 @@ export class ConditionalModalComponent implements OnInit {
       return elem.quantity !== 0
     });
 
-
+    this.showBodyShoppingCart = this.informationVisibilityInModal( this.productsListCleanWithOutQuantityZero.length )
 
     this.discountsHash = JSON.parse(sessionStorage.getItem('discountsHash') || '{}' );
     this.discountsHashClean = this.discountsHash.filter( (elem) => {
@@ -73,7 +75,10 @@ export class ConditionalModalComponent implements OnInit {
       return elem.typeMessage === 2;
     });
 
+  }
 
+  informationVisibilityInModal( productListLength: any ){
+    return ( productListLength > 0 ) ? true : false;
   }
 
   onSelect(selected: 'pos' | 'neg') {
