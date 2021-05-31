@@ -16,6 +16,8 @@ export class ConditionalModalComponent implements OnInit {
 
   productsList = Array();
   productsListClean = Array();
+  productsListCleanWithOutQuantityZero = Array();
+
 
   discountsHash = Array();
   discountsHashClean = Array();
@@ -41,19 +43,22 @@ export class ConditionalModalComponent implements OnInit {
     this.totalDiscountCartStorage = JSON.stringify(sessionStorage.getItem('totalDiscountCartModal'));
 
     if( this.totalDiscountCartStorage === "0" ){
-      console.log("entro en false");
       this.existDiscount = false;
     }else{
-      console.log("entro en true");
       this.existDiscount = true;
     }
 
     this.totalWithDiscountCartStorage = JSON.stringify(sessionStorage.getItem('totalWithDiscountCartModal'));
  
-
     this.productsListClean = this.productsList.filter( elem => {
       return elem !== null
     });
+
+    this.productsListCleanWithOutQuantityZero = this.productsListClean.filter( elem => {
+      return elem.quantity !== 0
+    });
+
+
 
     this.discountsHash = JSON.parse(sessionStorage.getItem('discountsHash') || '{}' );
     this.discountsHashClean = this.discountsHash.filter( (elem) => {
