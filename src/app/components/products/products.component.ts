@@ -71,6 +71,8 @@ export class ProductsComponent implements OnInit {
         discountsHash[numberInBrand].threshold =  discountList[i].threshold;
         discountsHash[numberInBrand].discount =  discountList[i].discount;
         discountsHash[numberInBrand].totalByBrand = 0;
+        discountsHash[numberInBrand].message = '';
+        discountsHash[numberInBrand].typeMessage = 0;
       }
     }
     console.log('[discountsToHash] return: ');
@@ -183,6 +185,9 @@ export class ProductsComponent implements OnInit {
     let discount;
     let brandNumber;
     let totalDiscounts : number = 0;
+    let messageAddMoreProduct = '';
+    let messageDiscountsByBrand = '';
+
     for (var [key, value] of Object.entries( this.discountsHash )) {
       console.log(key, value, value.totalByBrand, value.threshold, value.discount);
       totalByBrand = value.totalByBrand;
@@ -194,20 +199,34 @@ export class ProductsComponent implements OnInit {
       if( totalByBrand > 0) {
         if( totalByBrand < threshold ){
           let difference = threshold - totalByBrand;
-          let message = `Agrega ${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de ${discount} en tu compra!`;
-          console.log(message);
-          console.log(difference);
+          let messageAddMoreProduct = `Agrega $${difference} más en productos Marca${brandNumber} y aprovecha un descuento total de $${discount} en tu compra!`;
+          // console.log(message);
+          // console.log(difference);
+          this.discountsHash[parseInt(brandNumber)].message = messageAddMoreProduct;
+          this.discountsHash[parseInt(brandNumber)].typeMessage = 1;
+
         } else {
-          let message2 = `Se aplicó un descuento de ${discount} por haber comprado ${threshold} de productos Marca${brandNumber}!`;
-          console.log(message2);
+          messageDiscountsByBrand = `* Se aplicó un descuento de $${discount} por haber comprado $${threshold} de productos Marca${brandNumber}!`;
+          // console.log(message2);
           totalDiscounts += discount;
+          this.discountsHash[parseInt(brandNumber)].message = messageDiscountsByBrand;
+          this.discountsHash[parseInt(brandNumber)].typeMessage = 2;
         }
       }
     }
     sessionStorage.setItem('totalDiscountCartModal', ''+totalDiscounts);
 
+    sessionStorage.setItem('discountsHash', ''+JSON.stringify(this.discountsHash));
+    console.log( JSON.parse(sessionStorage.getItem('discountsHash') || '{}' ) );
+
+
     console.log('[calculateTotalDiscount] return totalDiscounts');
     console.log(totalDiscounts);
+
+    console.log(this.discountsHash);
+    
+
+
     return totalDiscounts;
   }
 
@@ -227,7 +246,7 @@ export class ProductsComponent implements OnInit {
 
 
 
-  cleanCart(){
+  cleanCart() {
     //localStorage.removeItem('infoCart');
     sessionStorage.removeItem('infoCart');
     console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
@@ -237,6 +256,8 @@ export class ProductsComponent implements OnInit {
     sessionStorage.removeItem('totalDiscountCartModal');
 
     sessionStorage.removeItem('totalWithDiscountCartModal');
+    
+
   }
 
   /*getInfoDiscounts() {
@@ -245,6 +266,14 @@ export class ProductsComponent implements OnInit {
 
   removeMarcaInBrand( brand: String ){
     return brand.replace('Marca', '');
+  }
+
+  viewProduct(){
+    alert("Method viewProduct is not implemented");
+  }
+
+  removeProduct(){
+    alert("Method removeProduct is not implemented");
   }
 
 }
