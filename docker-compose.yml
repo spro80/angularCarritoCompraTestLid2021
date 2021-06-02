@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+    angular-service:
+      container_name: angularcontainer
+      build: .
+      command: sh -c "npm run start"
+      ports: 
+        - '4200:4200'
+      working_dir: /usr/src/app
+      volumes:
+        - ./:/usr/src/app
+      networks:
+        - lider-network
+
+networks:
+  lider-network:
+    driver: bridge        
