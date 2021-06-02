@@ -1,6 +1,9 @@
 <div class="album py-5 bg-light">
     <div class="container">
 
+      <div class="alert alert-warning" role="alert" *ngIf="controlMessageInformative">
+        En estos momentos no podemos atender tu requerimiento. Intente más tarde.
+      </div>
       <!--<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" *ngFor="let product of productsList; let i = index">-->
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" *ngFor="let data of chunkArray ">
           <!--<button type="button" class="btn btn-sm btn-outline-secondary" (click)="cleanCart()">Add</button>-->

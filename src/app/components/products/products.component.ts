@@ -15,6 +15,7 @@ export class ProductsComponent implements OnInit {
   chunkArray = Array();
   discountsList = Array();
   discountsHash = Array();
+  controlMessageInformative : Boolean = false;
 
   ngOnInit(): void {
     this.callGetProducts();
@@ -28,6 +29,11 @@ export class ProductsComponent implements OnInit {
     this.productsService.getProducts$( )
       .subscribe( (data: any) => {
         console.log(data);
+        
+        if(data.statusCode !== 200){
+          this.controlMessageInformative = true;
+        }
+        
         this.productsList = data.products;
         products = data.products;
 
@@ -39,7 +45,11 @@ export class ProductsComponent implements OnInit {
           return e;
         });
 
-      });
+      },
+      (error) => {
+        this.controlMessageInformative = true;
+      }
+      );
   }
 
 
@@ -48,9 +58,18 @@ export class ProductsComponent implements OnInit {
     this.productsService.getDiscounts( )
       .subscribe( (data: any) => {
         console.log(data);
+
+        if(data.statusCode !== 200){
+          this.controlMessageInformative = true;
+        }
+
         this.discountsList = data.discounts;
         this.discountsHash = this.discountsToStructureHash( this.discountsList );
-      });
+      },
+      (error) => {
+        this.controlMessageInformative = true;
+      }
+      );
   }
 
 
@@ -79,18 +98,6 @@ export class ProductsComponent implements OnInit {
     return discountsHash;
   }
 
-  /*
-  discountsResetTotalByBrand( ) {
-    console.log('[discountsToHash] Init in method');
-    let removeStringInBrand = 'Marca';
-    let brand = '';
-
-    for(let i=0; i<this.discountsHash.length; i++) {
-      brand = this.discountsHash[i].brand;
-      let numberInBrand = parseInt(brand.replace(removeStringInBrand, ''));
-      this.discountsHash[numberInBrand].totalByBrand = 0;
-    }
-  }*/
 
   discountsResetMessageDiscount( ) {
     console.log('[discountsResetMessageDiscount] Init in method');
@@ -98,8 +105,6 @@ export class ProductsComponent implements OnInit {
     this.discountsHash = this.discountsHash.map( (elem, key) => {
       if ( elem.message !== '') {
         elem.message = '';
-      }else {
-        console.log('NOOOO se debe vaciar la estructura del elemento....');
       }
       if( elem.typeMessage !== 0) {
         elem.typeMessage = 0;
@@ -170,8 +175,7 @@ export class ProductsComponent implements OnInit {
     }
 
     sessionStorage.setItem('infoCart', ''+JSON.stringify(this.cart));
-    console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
-
+    // console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
 
     this.discountsHash = this.discountsToStructureHash( this.discountsList );
 
@@ -251,7 +255,7 @@ export class ProductsComponent implements OnInit {
       threshold = value.threshold;
       discount = value.discount;
       brandNumber = key;
-      console.log("key, value, totalByBrand, threshold, discount", key, value, totalByBrand, threshold, discount );
+      // console.log("key, value, totalByBrand, threshold, discount", key, value, totalByBrand, threshold, discount );
         
       if( totalByBrand > 0) {
         if( totalByBrand < threshold ){
@@ -295,7 +299,7 @@ export class ProductsComponent implements OnInit {
   cleanCart() {
 
     sessionStorage.removeItem('infoCart');
-    console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
+    // console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
 
     sessionStorage.removeItem('totalCartModal');
 
