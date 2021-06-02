@@ -12,4 +12,9 @@ export class CategoryComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  categoryAction() {
+    alert("For the moment this functionality is not implemented");
+  }
+
+
 }
