@@ -1,46 +1,4 @@
-
-/*import { Injectable } from '@angular/core';
-//import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { SessionService } from './../../../core/services/session.service';
-import { MsCallService } from './../../../core/services/ms-call.service';
-import { Observable } from 'rxjs';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ProductsService extends MsCallService {
-
-  static ngInjectableDef = undefined;
-  servicesUrl: any;
-
-  constructor(http: HttpClient, sessService: SessionService) { 
-    super(http, sessService);
-    this.servicesUrl = 'urlenvironment';//environment.msUrlCustomerInformationIngress;
-  }
-
-  public createBodyProducts(
-    console.log("INIT IN createBodyProducts!!!");
-    ) {
-    const body = {
-    };
-    console.log(body);
-    const urlEndPoint = 'products';
-    return this.msCall(body, urlEndPoint);
-  }
-
-  public msCall(body: any, path: string): Observable<any> {
-    return super.msCall(body, path);
-  }
- 
-
-}
-*/
-
-
 import { Injectable } from '@angular/core';
-//import { HttpClient, HttpHeaders } from '@angular/common/http';
-//import { Observable } from "rxjs";
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap, map } from 'rxjs/operators';
@@ -83,7 +41,7 @@ export class ProductsService {
 
 
   //getProducts( ): Observable<Product> {
-  getProducts( ) {
+  /*getProducts( ) {
     const headers = {}; //this.createHeaders( accessToken );
     const urlApiRequest = this.createURL(this.urlBase, this.productPath);
     console.log( urlApiRequest );
@@ -91,8 +49,19 @@ export class ProductsService {
               .pipe( map( data => {
                 return data;
               }))
-  }
+  }*/
 
+
+  
+  /*
+  TODO: Create request with autorization, use JWT for request. The API must add middleware for validation of token. 
+  createHeaders( accessToken ) {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${accessToken}`
+    });
+    return headers;
+  }
+  */
 
   getProducts$(): Observable<Product[]> {
     const headers = {}; //this.createHeaders( accessToken );
@@ -116,14 +85,7 @@ export class ProductsService {
               }))
   }
 
-  /*
-  createHeaders( accessToken ) {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${accessToken}`
-    });
-    return headers;
-  }
-  */
+
 }
 
 

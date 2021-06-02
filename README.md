@@ -4,6 +4,10 @@
 ### 1.- RUN ANGULAR IN LOCAL:
 #### Execute the follow commands in directory root of the project:
 npm i
+
+### Only in case of error in the instalation, you can use this command:
+npm install ----legacy-peer-deps
+
 npm run start
 #### Open navigator in:
 localhost:4200
