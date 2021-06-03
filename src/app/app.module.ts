@@ -9,7 +9,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { CategoryComponent } from './components/category/category.component';
 import { ProductsComponent } from './components/products/products.component';
-import { ProductModule } from './modules/product/product.module';
+//import { ProductModule } from './modules/product/product.module';
 //import { ModalWindowComponent } from './components/modal-window/modal-window.component';
 import { ConditionalModalComponent } from './components/conditional-modal/conditional-modal.component';
 
@@ -27,8 +27,7 @@ import { ConditionalModalComponent } from './components/conditional-modal/condit
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
-    ProductModule
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
