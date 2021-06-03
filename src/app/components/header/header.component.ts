@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StructureModalWindow } from 'src/app/components/modal-window/StructureModalWindow';
+//import { StructureModalWindow } from 'src/app/components/modal-window/StructureModalWindow';
 
 @Component({
   selector: 'app-header',
@@ -12,7 +12,7 @@ export class HeaderComponent implements OnInit {
   message: String = '';
   showModalBox: boolean = false;
 
-  infoModal: StructureModalWindow = new StructureModalWindow('', '', '', '', false);
+  infoModal: any;//StructureModalWindow = new StructureModalWindow('', '', '', '', false);
   modalInformativeOpen: boolean = false;
   modalOpen: boolean = false;
 
@@ -33,7 +33,7 @@ export class HeaderComponent implements OnInit {
       const title = '';
       const information = '';
       const nameButton = '';
-      this.infoModal = new StructureModalWindow(title, information, nameButton, modalId, false);
+      this.infoModal;// = new StructureModalWindow(title, information, nameButton, modalId, false);
     }
 
   }
