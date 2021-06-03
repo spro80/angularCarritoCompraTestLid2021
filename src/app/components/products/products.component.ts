@@ -1,5 +1,5 @@
 import { Component, ComponentFactoryResolver, OnInit } from '@angular/core';
-import { ProductsService } from './../../../app/modules/product/services/products.service'
+import { ProductsService } from './services/products.service'
 
 @Component({
   selector: 'app-products',
@@ -299,7 +299,6 @@ export class ProductsComponent implements OnInit {
   cleanCart() {
 
     sessionStorage.removeItem('infoCart');
-    // console.log( JSON.parse(sessionStorage.getItem('infoCart') || '{}' ) );
 
     sessionStorage.removeItem('totalCartModal');
 
