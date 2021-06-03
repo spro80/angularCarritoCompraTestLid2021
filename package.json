@@ -8,7 +8,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:mutation": "node_modules/@stryker-mutator/core/bin/stryker run"
   },
   "private": true,
   "dependencies": {
@@ -30,6 +31,11 @@
     "@angular-devkit/build-angular": "~0.1102.6",
     "@angular/cli": "~11.2.6",
     "@angular/compiler-cli": "~11.2.7",
+    "@stryker-mutator/api": "^2.4.0",
+    "@stryker-mutator/core": "^2.4.0",
+    "@stryker-mutator/html-reporter": "^2.4.0",
+    "@stryker-mutator/jest-runner": "^2.4.0",
+    "@stryker-mutator/typescript": "^2.4.0",
     "@types/jest": "^26.0.23",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
