@@ -5,6 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class SessionService {
  
- constructor() { }
+  constructor() { }
+
+  /*
+  get totalCart(): string {
+    return sessionStorage.getItem('total');
+    //JSON.parse(localStorage.getItem('total') || '{}');
+  }
+
+  set totalCart(total: string) {
+    sessionStorage.setItem('total', total);
+  }*/
  
 }
